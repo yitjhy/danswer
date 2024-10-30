@@ -41,8 +41,25 @@ function SourceTile({
 export default function Page() {
   const sources = useMemo(() => listSourceMetadata(), []);
   const [searchTerm, setSearchTerm] = useState("");
+  const [youTubeUrl, setYouTubeUrl] = useState('')
+  const [youtubeInfo, setYoutubeInfo] = useState({
+    audioUrl: '',
+    tile: '',
+    description: '',
+    url: ''
+  })
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAddYouTube = () => {
+    fetch(`http://localhost:5719/youtube?url=${encodeURI(youTubeUrl)}`)
+    .then(response => response.json())
+    .then(data => {
+      setYoutubeInfo(data as any)
+      }).catch(e => {
+      console.log(e);
+    });
+  }
 
   useEffect(() => {
     if (searchInputRef.current) {
@@ -139,6 +156,33 @@ export default function Page() {
             </div>
           </div>
         ))}
+        <div>
+          <span>YouTube视频连接器connector</span>
+          <div className="flex gap-x-2">
+            <input
+              type="text"
+              placeholder="Search connectors..."
+              value={youTubeUrl}
+              onChange={(e) => setYouTubeUrl(e.target.value)}
+              className="ml-1 w-96 h-9 flex-none rounded-md border border-border bg-background-50 px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            />
+            <Button onClick={() => {
+              handleAddYouTube()
+            }}>添加</Button>
+          </div>
+          <div className="mt-4">
+            <span>YouTube标题:</span>
+            <div className="text-[14px] indent-8">{youtubeInfo.tile}</div>
+          </div>
+          <div className="mt-4">
+            <span>YouTube描述:</span>
+            <div className="text-[14px] indent-8">{youtubeInfo.description}</div>
+          </div>
+          <div className="mt-4">
+            <span>YouTube URL:</span>
+            <div className="text-[14px] indent-8">{youtubeInfo.url}</div>
+          </div>
+        </div>
     </div>
   );
 }
